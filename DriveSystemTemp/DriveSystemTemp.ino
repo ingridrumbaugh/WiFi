@@ -1,11 +1,22 @@
-#include <SPI.h> 
+// #include <SPI.h> 
 
 #define pwm1 3
 #define pwm2 4
+
+#define arm_pwm1 51
+#define arm_pwm2 47
+
 #define motor1Pin1 7 // INA
 #define motor1Pin2 8 // INB
+
 #define motor2Pin1 5
 #define motor2Pin2 6
+
+#define arm_motor1_pin1 52
+#define arm_motor1_pin2 53
+
+#define arm_motor2_pin1 49
+#define arm_motor2_pin2 48
 
 void setup() {
   pinMode(pwm1, OUTPUT);
@@ -21,14 +32,17 @@ void setup() {
 
 void loop() {
   motor1Forward(100); 
-  delay(500); 
+  delay(1000); 
   motor1Backward(100); 
-  delay(500); 
+  delay(1000); 
   motor1Pause(); 
+  delay(1000); 
   motor2Forward(100); 
-  delay(500);
+  delay(1000);
   motor2Backward(100); 
-  delay(100); 
+  delay(1000); 
+  motor2Pause();
+  delay(1000);
 }
 
 void motor1Forward(int pwm) {
