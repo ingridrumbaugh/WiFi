@@ -32,8 +32,7 @@ void setup()
     Serial.println("setRF failed");    
 }
 
-void loop()
-{
+void loop() {
   if (nrf24.available())
   {
     // Should be a message for us now   
