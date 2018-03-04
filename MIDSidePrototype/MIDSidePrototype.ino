@@ -32,6 +32,15 @@ int bin[] = {000, 1, 10, 11, 100, 101, 110, 111};
 #define joy1SW 7 // this used to be 6
 #define joy0SW 9 // this used to be 7
 
+int joystate1 = 0;
+int joystate2 = 0;
+int bstate1 = 0;
+int bstate2 = 0;
+int bstate3 = 0; 
+int bstate4 = 0;
+int bstate5 = 0; 
+int bstate6 = 0; 
+
 void setup() {
   pinMode(s0, OUTPUT);
   pinMode(s1, OUTPUT);
@@ -148,9 +157,53 @@ void mux_read() {
     Serial.print(analogRead(sig));
     Serial.println("  ");
     Serial.println("-----------------");
-
-    delay(1000); // time to read - this will probs go down to 100
+    if (cnt == 1) {
+      joy1(sig); 
+    } else if (cnt == 2) {
+      joy2(sig); 
+    } else if (cnt == 3) {
+      button1(sig); 
+    } else if (cnt == 4) {
+      button2(sig);  
+    } else if (cnt == 5) {
+      button3(sig); 
+    }
+    
+    // delay(1000); // time to read - this will probs go down to 100
   }
+}
+
+// CHECK BUTTON1 STATE 
+// IF IN STOP MODE, DON'T DRIVE MOTORS 
+void joy1(int state) {
+  joystate1 = state; 
+  // send this to the robot 
+}
+
+void joy2(int state){
+  joystate2 = state; 
+  // send this to the robot 
+  
+}
+
+// STOP BUTTON 
+// REVERSES BUTTON STATE - EITHER STOP OR START DRIVE MOTORS 
+void button1(int state) {
+  bstate1 = state; 
+  
+}
+
+// ROTATE ARM DC MOTOR 
+void button2(int state) {
+  bstate2 = state;
+
+  
+}
+
+// ROTATE ARM STEPPER MOTOR 
+void button3(int state) {
+  bstate3 = state; 
+  
 }
 
 
