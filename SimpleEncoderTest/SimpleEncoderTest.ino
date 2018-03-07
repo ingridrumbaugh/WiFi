@@ -47,7 +47,7 @@ void loop() {
     
     Serial.println("Enc1: "); 
     Serial.print(enc1Pos);
-    Serial.print("/"); 
+    //Serial.print("/"); 
     Serial.println(" "); 
   }
   if ((enc2ALast == LOW) && (n2 == HIGH)) {
@@ -58,7 +58,7 @@ void loop() {
     }
     Serial.println("Enc2: "); 
     Serial.print(enc2Pos);
-    Serial.print("/"); 
+    //Serial.print("/"); 
     Serial.println(" "); 
   }
   enc1ALast = n1; 
