@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include <RH_NRF24.h>
 #include <Servo.h>
+#include <Stepper.h> 
 
 // NRF PINS
 #define CE   8
@@ -34,7 +35,7 @@ RH_NRF24 nrf24;
 
 // ARM MOTOR PINS
 #define arm_pwm1 51
-#define arm_pwm2 47
+#define arm_pwm2 47 // NOT 41!
 
 #define arm_motor1_pin1 52
 #define arm_motor1_pin2 53
@@ -47,6 +48,14 @@ RH_NRF24 nrf24;
 Servo servo1;
 int servo1_pos = 0;
 
+// ARM STEPPERS 
+// start @ 22 
+const int stepsPerRevA = (1/0.9)*360;
+const int stepsPerRevW = (1/1.8)*360; 
+
+Stepper armStepper(stepsPerRevA, 22, 23, 24, 25); 
+Stepper wristStepper(stepsPerRevW, 26, 27, 28, 29); 
+
 void setup() {
   pinMode(pwm1, OUTPUT);
   pinMode(motor1Pin1, OUTPUT);
@@ -56,6 +65,9 @@ void setup() {
   pinMode(motor2Pin1, OUTPUT);
   pinMode(motor2Pin2, OUTPUT);
 
+  armStepper.setSpeed(100); 
+  wristStepper.setSpeed(100); 
+  
   Serial.begin(9600);
 
   //if the voltage on pin 2 changes, run the channelA subroutine
@@ -226,6 +238,30 @@ void motor2Pause() {
   digitalWrite(motor2Pin1, HIGH);
   digitalWrite(motor2Pin2, HIGH);
   analogWrite(pwm2, 0);
+}
+
+void wristclockwise(int timedelay) {
+  Serial.println("Wrist clockwise");
+  wristStepper.step(stepsPerRevW); 
+  delay(timedelay); 
+}
+
+void wristcnterclockwise(int timedelay) {
+  Serial.println("Wrist cnterclockwise");
+  wristStepper.step(-stepsPerRevW); 
+  delay(timedelay); 
+}
+
+void armclockwise(int timedelay) {
+  Serial.println("clockwise");
+  armStepper.step(stepsPerRevA);
+  delay(timedelay); 
+}
+
+void armcnterclockwise(int timedelay) {
+  Serial.println("counterclockwise");
+  armStepper.step(-stepsPerRevA); 
+  delay(timedelay); 
 }
 
 /**
