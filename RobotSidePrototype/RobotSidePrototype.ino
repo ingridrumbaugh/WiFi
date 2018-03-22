@@ -17,8 +17,14 @@
 // Instance of the radio driver
 RH_NRF24 nrf24;
 
+// VALUES FOR GAS SENSOR 
+#define gas_sensor A0
+int init_val; 
+double sensor_vals[300];
+double sensor_avg; // steady state average value 
+
 // DRIVE MOTOR PINS
-#define pwm1 3
+#define pwm1 30
 #define pwm2 4
 
 #define motor1Pin1 7 // INA
@@ -33,15 +39,31 @@ RH_NRF24 nrf24;
 #define enc2A 20
 #define enc2B 21
 
+// VALUES FOR DRIVE MOTOR ENCODERS 
+int val1;
+int enc1Pos = 0; 
+int enc1ALast = LOW;
+int n1 = LOW; 
+
+int val2; 
+int enc2Pos = 0; 
+int enc2ALast = LOW; 
+int n2 = LOW; 
+
 // ARM MOTOR PINS
 #define arm_pwm1 51
-#define arm_pwm2 47 // NOT 41!
-
 #define arm_motor1_pin1 52
 #define arm_motor1_pin2 53
 
-#define arm_motor2_pin1 49
-#define arm_motor2_pin2 48
+// ARM ENCODERS 
+#define enc3A 2
+#define enc3B 3
+
+// VALUES FOR ARM MOTOR ENCODER 
+int val3; 
+int enc3Pos = 0; 
+int enc3ALast = LOW; 
+int n3 = LOW; 
 
 // ARM SERVOS
 #define servo1_pin 46
@@ -49,7 +71,6 @@ Servo servo1;
 int servo1_pos = 0;
 
 // ARM STEPPERS 
-// start @ 22 
 const int stepsPerRevA = (1/0.9)*360;
 const int stepsPerRevW = (1/1.8)*360; 
 
@@ -65,6 +86,17 @@ void setup() {
   pinMode(motor2Pin1, OUTPUT);
   pinMode(motor2Pin2, OUTPUT);
 
+  pinMode(enc1A, INPUT);
+  pinMode(enc1B, INPUT);
+  pinMode(enc2A, INPUT);
+  pinMode(enc2B, INPUT);
+
+  pinMode(enc3A, INPUT);
+  pinMode(enc3B, INPUT); 
+
+  init_val = 300; 
+  sensor_avg = 0; 
+  
   armStepper.setSpeed(100); 
   wristStepper.setSpeed(100); 
   
@@ -83,9 +115,15 @@ void setup() {
 }
 
 void loop() {
-  // Run both motors forward 
-  motor1FWD(100);
-  motor2FWD(100);
+
+  read_motor_encoders();
+  read_arm_encoders(); 
+
+  wristcnterclockwise(0); 
+  delay(1000);
+  wristclockwise(0); 
+  delay(1000);
+  
 }
 
 /**
@@ -151,6 +189,71 @@ void nrf_client() {
 }
 
 
+void read_motor_encoders() {
+  n1 = digitalRead(enc1A);
+  n2 = digitalRead(enc2A); 
+
+  // calculate encoder 1 
+  if ((enc1ALast == LOW) && (n1 == HIGH)) {
+    if (digitalRead(enc1B) == LOW) {
+      enc1Pos --; 
+    } else {
+      enc1Pos ++; 
+    }
+  }
+
+  // calculate encoder 2
+  if ((enc2ALast == LOW) && (n2 == HIGH)) {
+    if (digitalRead(enc2B) == LOW) {
+      enc2Pos --; 
+    } else {
+      enc2Pos ++; 
+    }
+  }
+  
+}
+
+void read_arm_encoders() {
+  n3 = digitalRead(enc3A); 
+
+  // calculate encoder 3
+  if ((enc3ALast == LOW) && (n3 == HIGH)) {
+    if (digitalRead(enc3B) == LOW) {
+      enc3Pos --;
+    } else {
+      enc3Pos ++; 
+    }
+  }
+  
+}
+
+void read_gas_sensor() {
+  if (init_val > 0) {
+    sensor_vals[300-init_val] = analogRead(A0); 
+    init_val --; 
+  }
+  else if (init_val == 0) {
+    double sum = 0; 
+    for (int i = 0; i < 300; i ++) {
+      sum += sensor_vals[i]; 
+    }
+    sensor_avg = sum / 300; 
+    init_val = -1; 
+  }
+  if (init_val < 0) {
+    double val = analogRead(A0)/sensor_avg; 
+    if (val > 2) 
+      writeLEDs(255); 
+    else 
+      writeLEDs(0); 
+  }
+  
+}
+
+void writeLEDs(int analogval) {
+  // Send analog val of red led to the MID 
+}
+
 /**
  * Servo Demo - Run servo forwards and backwards
  */
@@ -179,7 +282,6 @@ void fullStop() {
   motor1Pause();
   motor2Pause();
   armMotor1Pause();
-  armMotor2Pause();
 }
 
 /**
@@ -265,30 +367,24 @@ void armcnterclockwise(int timedelay) {
 }
 
 /**
- * Empty methods for the arm motor 
+ * Methods for the arm motor 
  */
 void armMotor1FWD(int pwm) {
-
+  digitalWrite(arm_motor1_pin1, HIGH);
+  digitalWrite(arm_motor1_pin2, LOW);
+  analogWrite(arm_pwm1, pwm);
 }
 
 void armMotor1BWD(int pwm) {
-
+  digitalWrite(arm_motor1_pin1, LOW); 
+  digitalWrite(arm_motor1_pin2, HIGH); 
+  analogWrite(arm_pwm1, pwm); 
 }
 
 void armMotor1Pause() {
-
+  digitalWrite(arm_motor1_pin1, HIGH); 
+  digitalWrite(arm_motor1_pin2, HIGH); 
 }
 
-void armMotor2FWD(int pwm) {
-
-}
-
-void armMotor2BWD(int pwm) {
-
-}
-
-void armMotor2Pause() {
-
-}
 
 
