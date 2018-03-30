@@ -9,10 +9,10 @@
 
 // NRF PINS
 #define CE   8
-#define CSN  10
-#define SCK  13
-#define MOSI 11
-#define MISO 12
+#define CSN  53
+#define SCK  52
+#define MOSI 51
+#define MISO 50
 
 // Instance of the radio driver
 RH_NRF24 nrf24;
@@ -50,23 +50,24 @@ int enc2Pos = 0;
 int enc2ALast = LOW; 
 int n2 = LOW; 
 
-// ARM MOTOR PINS
-#define arm_pwm1 51
-#define arm_motor1_pin1 52
-#define arm_motor1_pin2 53
-
-// ARM ENCODERS 
-#define enc3A 2
-#define enc3B 3
-
 // VALUES FOR ARM MOTOR ENCODER 
 int val3; 
 int enc3Pos = 0; 
 int enc3ALast = LOW; 
 int n3 = LOW; 
 
+// ARM MOTOR PINS
+#define arm_pwm1 42 // 51
+#define arm_motor1_pin1 43 // 52
+#define arm_motor1_pin2 44 // 53
+
+// ARM ENCODERS 
+#define enc3A 2
+#define enc3B 3
+
 // ARM SERVOS
 #define servo1_pin 46
+
 Servo servo1;
 int servo1_pos = 0;
 
@@ -97,14 +98,11 @@ void setup() {
   init_val = 300; 
   sensor_avg = 0; 
   
-  armStepper.setSpeed(100); 
-  wristStepper.setSpeed(100); 
+  armStepper.setSpeed(300); 
+  wristStepper.setSpeed(300); 
   
   Serial.begin(9600);
 
-  //if the voltage on pin 2 changes, run the channelA subroutine
-  //  while (!Serial)
-  //    ; // wait for serial port to connect. Needed for Leonardo only
   if (!nrf24.init())
     Serial.println("init failed");
   // Defaults after init are 2.402 GHz (channel 2), 2Mbps, 0dBm
@@ -118,7 +116,7 @@ void loop() {
 
   read_motor_encoders();
   read_arm_encoders(); 
-
+  read_gas_sensor(); 
   wristcnterclockwise(0); 
   delay(1000);
   wristclockwise(0); 
@@ -254,24 +252,15 @@ void writeLEDs(int analogval) {
   // Send analog val of red led to the MID 
 }
 
-/**
- * Servo Demo - Run servo forwards and backwards
- */
-void servoTest() {
-  for (servo1_pos = 0; servo1_pos <= 180; servo1_pos += 1) { 
-    // goes from 0 degrees to 180 degrees
-    servo1.write(servo1_pos);              
-    // tell servo to go to position in variable 'pos'
-    delay(15);                       
-    // waits 15ms for the servo to reach the position
+void arm_servo_fwd() {
+  for (int j = 0; j < 180; j ++) {
+    servo1.write(j); 
   }
+}
 
-  for (servo1_pos = 180; servo1_pos >= 0; servo1_pos -= 1) { 
-    // goes from 180 degrees to 0 degrees
-    servo1.write(servo1_pos);              
-    // tell servo to go to position in variable 'pos'
-    delay(15);                       
-    // waits 15ms for the servo to reach the position
+void arm_servo_bwd() {
+  for (int k = 180; k < 0; k --) {
+    servo1.write(k); 
   }
 }
 
