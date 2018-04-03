@@ -22,6 +22,7 @@ RH_NRF24 nrf24;
 int init_val; 
 double sensor_vals[300];
 double sensor_avg; // steady state average value 
+int gaslevels[5]; 
 
 // DRIVE MOTOR PINS
 #define pwm1 30
@@ -241,15 +242,17 @@ void read_gas_sensor() {
   if (init_val < 0) {
     double val = analogRead(A0)/sensor_avg; 
     if (val > 2) 
-      writeLEDs(255); 
+      writeLEDs(4, 255); 
     else 
-      writeLEDs(0); 
+      writeLEDs(4, 0); 
   }
   
 }
 
-void writeLEDs(int analogval) {
+void writeLEDs(int index, int analogval) {
   // Send analog val of red led to the MID 
+  
+  // send LED[index] = analogval 
 }
 
 void arm_servo_fwd() {
