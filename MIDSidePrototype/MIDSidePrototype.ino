@@ -34,6 +34,11 @@ bool gaslevel[] = {0,0,0,0,0};
 int joystate1 = 0;
 int joystate2 = 0;
 int bstate[8] = {0,0,0,0,0,0,0,0}; 
+int red1state = 0; // 0 is off --- 1 is on 
+int red2state = 0; 
+int red3state = 0; 
+int red4state = 0; 
+int greenstate = 0; 
 
 void setup() {
   Serial.begin(9600);
@@ -48,14 +53,23 @@ void setup() {
   digitalWrite(s1, LOW);
   digitalWrite(s2, LOW);
   digitalWrite(s3, LOW);
+  
+  if (!nrf24.init())
+    Serial.println("init failed");
+  // Defaults after init are 2.402 GHz (channel 2), 2Mbps, 0dBm
+  if (!nrf24.setChannel(1))
+    Serial.println("setChannel failed");
+  if (!nrf24.setRF(RH_NRF24::DataRate2Mbps, RH_NRF24::TransmitPower0dBm))
+    Serial.println("setRF failed");
 }
 
 // Add code to run a motor when a button is pressed
 void loop() {
-  
   // MUX
   digitalWrite(en, LOW); // enable all the time for now
   mux_read();
+  sendMessage(); 
+  receiveMessage();
 }
 
 void mux_read() {
@@ -72,19 +86,6 @@ void mux_read() {
     digitalWrite(s1, c1);
     digitalWrite(s2, c2);
     digitalWrite(s3, c3); 
-//
-//    Serial.println("-----------------");
-//    Serial.print("\"Pin Number\": ");
-//    Serial.println(cnt);
-//    Serial.print("LED?: ");
-//    Serial.println(analogRead(sig));
-//    Serial.print("Accessing Item @ Pin: ");
-//    Serial.print(cnt);
-//    Serial.print("  ");
-//    Serial.print("Value @ This Item is: ");
-//    Serial.print(analogRead(sig));
-//    Serial.println("  ");
-//    Serial.println("-----------------");
 
     digitalWrite(sigout,LOW);
     
@@ -131,23 +132,126 @@ void mux_read() {
       Serial.print(bstate[5]); 
       Serial.println("  "); 
     } else if (cnt == 8) {
+      
       pinMode(sigout, OUTPUT); 
-      digitalWrite(sigout, HIGH); 
+      if (red1state == 0) {
+        digitalWrite(sigout, LOW); 
+      } else if (red1state == 1) {
+        digitalWrite(sigout, HIGH); 
+      }
+      
     } else if (cnt == 9) {
+      
       pinMode(sigout, OUTPUT); 
-      digitalWrite(sigout, HIGH);  
+      if (red2state == 0) {
+        digitalWrite(sigout, LOW); 
+      } else if (red2state == 1) {
+        digitalWrite(sigout, HIGH); 
+      }
+      
     } else if (cnt == 10) {
+      
       pinMode(sigout, OUTPUT); 
-      digitalWrite(sigout, HIGH); 
+      if (red3state == 0) {
+        digitalWrite(sigout, LOW); 
+      } else if (red3state == 1) {
+        digitalWrite(sigout, HIGH); 
+      }
+      
     } else if (cnt == 11) {
+      
       pinMode(sigout, OUTPUT); 
-      digitalWrite(sigout, HIGH);  
+      if (red4state == 0) {
+        digitalWrite(sigout, LOW); 
+      } else if (red4state == 1) {
+        digitalWrite(sigout, HIGH); 
+      }
+       
     } else if (cnt == 12) {
+      
       pinMode(sigout, OUTPUT); 
-      digitalWrite(sigout, HIGH); 
-    } 
+      if (greenstate == 0) {
+        digitalWrite(sigout, LOW); 
+      } else if (greenstate == 1) {
+        digitalWrite(sigout, HIGH); 
+      }
+  
+    } else if (cnt == 13) {
+      bstate[6] = digitalRead(sigout); 
+      Serial.print("Button 7: "); 
+      Serial.print(bstate[6]); 
+      Serial.println("  "); 
+    } else if (cnt == 14) {
+      bstate[7] = digitalRead(sigout); 
+      Serial.print("Button 8: "); 
+      Serial.print(bstate[7]); 
+      Serial.println("  "); 
+    }
 
     delay(500); // time to read - for debugging
   }
 }
+
+void sendMessage() {
+  Serial.println("Sending to ROBOT");
+  
+  byte mess[3];
+
+  uint8_t buttons = 0;
+
+  for(int i = 0; i < 8; i++) {
+    if(bstate != 0) {
+      buttons += bstate[i] << i;
+    }
+  }
+
+  mess[0] = (byte)joystate1;
+  mess[1] = (byte)joystate2;
+  mess[2] = (byte)buttons;
+  
+  nrf24.send(mess, sizeof(mess));
+
+  nrf24.waitPacketSent();
+
+  return;
+}
+
+
+void receiveMessage() {
+  Serial.println("Receiving from ROBOT");
+
+  //Define Input (Currently 1 byte)
+
+  byte buf[1] = {};
+  uint8_t len = sizeof(buf);
+
+  //Wait for message
+
+  if (nrf24.waitAvailableTimeout(500)) { 
+    // Should be a reply message for us now   
+    if (nrf24.recv((byte*)buf, &len)) {
+      Serial.println("Got reply.");
+    }
+    else {
+      Serial.println("Receive failed.");
+      return;
+    }
+  }
+
+  for(int j = 0; j < sizeof(buf); j++) {
+    Serial.print("Received over transceiver: ");
+    Serial.println((int)buf[j]);
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
 

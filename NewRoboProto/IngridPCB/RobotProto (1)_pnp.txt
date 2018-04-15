@@ -1,0 +1,57 @@
+*Pick And Place List
+*Company=
+*Author=
+*eMail=
+*
+*Project=RobotProto (1)
+*Date=20:48:14
+*CreatedBy=Fritzing 0.9.3b.04.19.5c895d327c44a3114e5fcc9d8260daf0cbb52806
+*
+*
+*Coordinates in mm, always center of component
+*Origin 0/0=Lower left corner of PCB
+*Rotation in degree (0-360, math. pos.)
+*
+*No;Value;Package;X;Y;Rotation;Side;Name
+1;;;56.9976;-55.0054;0;Bottom;Via8
+2;;;41.148;-89.7526;0;Bottom;Via13
+3;;;69.1896;-56.2246;0;Bottom;Via1
+4;;THT;9.65909;-92.8751;-90;Bottom;J8
+5;;;14.8503;-51.2379;0;Bottom;Via30
+6;;;86.868;-77.5606;0;Bottom;Via6
+7;;THT;7.24609;-65.1891;0;Bottom;J4
+8;;;77.724;-78.7798;0;Bottom;Via20
+9;;;80.1624;-45.2518;0;Bottom;Via25
+10;;;71.0184;-28.183;0;Bottom;Via27
+11;;;25.2984;-77.5606;0;Bottom;Via11
+12;;;51.9924;-49.9491;0;Bottom;Part1
+13;;;38.3122;-25.5882;90;Bottom;MD03A2
+14;;;76.2147;-89.2663;0;Bottom;DC_Mot_Enc7
+15;;;44.8056;-31.8406;0;Bottom;Via10
+16;;;37.14;-74.3101;-90;Bottom;MD03A1
+17;;;73.4568;-28.183;0;Bottom;Via2
+18;;;60.0456;-52.567;0;Bottom;Via28
+19;;;44.1269;-20.5359;0;Bottom;Via24
+20;;;47.8536;-31.8406;0;Bottom;Via14
+21;;;28.3464;-50.7382;0;Bottom;Via21
+22;;;77.1144;-80.6086;0;Bottom;Via22
+23;;;76.2147;-84.1863;0;Bottom;DC_Mot_Enc9
+24;;;75.8261;-20.7391;0;Bottom;Via16
+25;;;27.1272;-58.663;0;Bottom;Via5
+26;;;82.6008;-28.183;0;Bottom;Via7
+27;;;76.2147;-94.3463;0;Bottom;DC_Mot_Enc6
+28;;;76.1601;-36.5937;-90;Bottom;Part2
+29;;;70.7461;-20.7391;0;Bottom;Via17
+30;;;50.292;-27.5734;0;Bottom;Via29
+31;;;61.8744;-31.8406;0;Bottom;Via15
+32;;;63.0936;-52.567;0;Bottom;Via26
+33;;;86.2584;-84.8758;0;Bottom;Via18
+34;;;34.4424;-89.7526;0;Bottom;Via23
+35;;;81.3816;-33.0598;0;Bottom;Via3
+36;;;76.2147;-99.4263;0;Bottom;DC_Mot_Enc8
+37;;;32.6136;-87.3142;0;Bottom;Via19
+38;;;46.6344;-83.047;0;Bottom;Via12
+39;;;75.4375;-15.712;180;Bottom;DC_Mot_Enc5
+40;;;49.0728;-67.807;0;Bottom;Via9
+41;;;31.3944;-56.2246;0;Bottom;Via4
+42;;;7.24609;-51.2191;0;Bottom;J1

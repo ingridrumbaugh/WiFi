@@ -18,11 +18,13 @@
 RH_NRF24 nrf24;
 
 // VALUES FOR GAS SENSOR 
-#define gas_sensor A0
-int init_val; 
-double sensor_vals[300];
-double sensor_avg; // steady state average value 
-int gaslevels[5]; 
+#define gasPin A0
+int analogSensor; 
+
+// button values for MID Transmissions 
+int joystate1 = 0; 
+int joystate2 = 0; 
+int bstate[8] = {0, 0, 0, 0, 0, 0, 0, 0}; 
 
 // DRIVE MOTOR PINS
 #define pwm1 30
@@ -96,12 +98,9 @@ void setup() {
   pinMode(enc3A, INPUT);
   pinMode(enc3B, INPUT); 
 
-  init_val = 300; 
-  sensor_avg = 0; 
-  
-  armStepper.setSpeed(300); 
-  wristStepper.setSpeed(300); 
-  
+  armStepper.setSpeed(50); 
+  wristStepper.setSpeed(50); 
+  servo1.attach(servo1_pin); 
   Serial.begin(9600);
 
   if (!nrf24.init())
@@ -114,77 +113,89 @@ void setup() {
 }
 
 void loop() {
-
+  //receiveMessage(); 
   read_motor_encoders();
   read_arm_encoders(); 
   read_gas_sensor(); 
-  wristcnterclockwise(0); 
-  delay(1000);
-  wristclockwise(0); 
-  delay(1000);
-  
+  armcnterclockwise(0); 
+  //armclockwise(0);
+  //delay(500);  
+//  delay(1000); 
+//  arm_servo_fwd(); 
+//  delay(1000); 
+//  arm_servo_bwd(); 
+//  delay(1000); 
+//  armMotor1FWD(100); 
+//  delay(500); 
+//  armMotor1BWD(100);
+//  delay(500); 
+  //wristcnterclockwise(500); 
+  //wristclockwise(500); 
+  //delay(500);
+  //sendMessage(); 
 }
 
 /**
  * Example NRF Server code - to be called in loop 
  */
-void nrf_server() {
+void receiveMessage() {
+  Serial.println("Receiving from MID");
 
-  if (nrf24.available()) {
-    // Should be a message for us now
+  //Define Input (Currently 3 bytes)
+  byte buf[3] = {};
+  uint8_t len = sizeof(buf);
 
-    uint8_t buf[RH_NRF24_MAX_MESSAGE_LEN];
-    uint8_t len = sizeof(buf);
-
-    if (nrf24.recv(buf, &len)) {
-      // NRF24::printBuffer("request: ", buf, len);
-      Serial.print("got request: ");
-      Serial.println((char*)buf);
-
-      // Send a reply
-      uint8_t data[] = "And hello back to you";
-      nrf24.send(data, sizeof(data));
-      nrf24.waitPacketSent();
-      Serial.println("Sent a reply");
-    }
-    else {
-      Serial.println("recv failed");
-    }
+  //Wait for message
+  if(nrf24.recv((byte*)buf, &len)) {
+    Serial.print("Got reply.");
   }
+  else {
+    Serial.println("Receive failed.");
+    return;
+  }
+
+  joystate1 = buf[0];
+  joystate2 = buf[1];
+
+  Serial.print("Joystick 1: ");
+  Serial.println(joystate1);
+  Serial.print("Joystick 2: ");
+  Serial.println(joystate2);
+
+  byte bString = buf[2];
+
+  Serial.print("Buttonstring: ");
+  Serial.println(bString);
+  
+  Serial.print("Buttonstate Parsing: ");
+
+  for(int j = 0; j < 8; j++) {
+    bstate[7-j] = (bString >> (7 - j)) % 2;
+    Serial.print(bstate[7-j]);
+  }
+  
+  Serial.println();
 
 }
 
 /**
  * Example NRF Client code - to be called in loop 
  */
-void nrf_client() {
-  Serial.println("Sending to nrf24_server");
+void sendMessage() {
+ Serial.println("Sending to MID");
+  
+  byte gas[1];
 
-  // Send a message to nrf24_server
-  uint8_t data[] = "Hello World!";
-  nrf24.send(data, sizeof(data));
+  uint8_t temp = 101;
+  
+  //MESS[0] SHOULD BE THE GAS SENSOR DATA
+  gas[0] = (byte)temp;
+  
+  nrf24.send(gas, sizeof(gas));
 
   nrf24.waitPacketSent();
-  // Now wait for a reply
-  uint8_t buf[RH_NRF24_MAX_MESSAGE_LEN];
-  uint8_t len = sizeof(buf);
 
-  if (nrf24.waitAvailableTimeout(500)) {
-    // Should be a reply message for us now
-
-    if (nrf24.recv(buf, &len)) {
-      Serial.print("got reply: ");
-      Serial.println((char*)buf);
-    }
-    else {
-      Serial.println("recv failed");
-    }
-  }
-  else {
-    Serial.println("No reply, is nrf24_server running?");
-  }
-
-  delay(400);
+  return; 
 }
 
 
@@ -227,25 +238,8 @@ void read_arm_encoders() {
 }
 
 void read_gas_sensor() {
-  if (init_val > 0) {
-    sensor_vals[300-init_val] = analogRead(A0); 
-    init_val --; 
-  }
-  else if (init_val == 0) {
-    double sum = 0; 
-    for (int i = 0; i < 300; i ++) {
-      sum += sensor_vals[i]; 
-    }
-    sensor_avg = sum / 300; 
-    init_val = -1; 
-  }
-  if (init_val < 0) {
-    double val = analogRead(A0)/sensor_avg; 
-    if (val > 2) 
-      writeLEDs(4, 255); 
-    else 
-      writeLEDs(4, 0); 
-  }
+  analogSensor = analogRead(gasPin); 
+  
   
 }
 
@@ -256,14 +250,19 @@ void writeLEDs(int index, int analogval) {
 }
 
 void arm_servo_fwd() {
-  for (int j = 0; j < 180; j ++) {
-    servo1.write(j); 
+  int pos = 0;
+  for (pos = 0; pos <= 180; pos += 1) { 
+    // in steps of 1 degree
+    servo1.write(pos);              
+    delay(15);                       
   }
 }
 
 void arm_servo_bwd() {
-  for (int k = 180; k < 0; k --) {
-    servo1.write(k); 
+  int pos = 0; 
+  for (pos = 90; pos >= 0; pos -= 1) { 
+    servo1.write(pos);              
+    delay(15);                       
   }
 }
 
