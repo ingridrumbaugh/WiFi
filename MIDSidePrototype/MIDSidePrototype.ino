@@ -68,8 +68,8 @@ void loop() {
   // MUX
   digitalWrite(en, LOW); // enable all the time for now
   mux_read();
-  sendMessage(); 
-  receiveMessage();
+  //sendMessage(); 
+  //receiveMessage();
 }
 
 void mux_read() {
@@ -91,45 +91,45 @@ void mux_read() {
     if (cnt == 0) {
       pinMode(sigout, INPUT); 
       joystate1 = analogRead(sig); 
-//      Serial.println("Joy 1: ");
-//      Serial.print(joystate1);
-//      Serial.println(" ");
+      Serial.println("Joy 1: ");
+      Serial.print(joystate1);
+      Serial.println(" ");
     } else if (cnt == 1) {
       pinMode(sigout, INPUT); 
       joystate2 = analogRead(sig); 
-//      Serial.println("Joy 2: ");
-//      Serial.print(joystate2);
-//      Serial.println(" ");
+      Serial.println("Joy 2: ");
+      Serial.print(joystate2);
+      Serial.println(" ");
     } else if (cnt == 2) {
-//      Serial.print("Button 1: "); 
+      Serial.print("Button 1: "); 
       bstate[0] = digitalRead(sigout); 
-//      Serial.print(bstate[0]); 
-//      Serial.println("  "); 
+      Serial.print(bstate[0]); 
+      Serial.println("  "); 
     } else if (cnt == 3) {
       bstate[1] = digitalRead(sigout); 
-//      Serial.print("Button 2: ");
-//      Serial.print(bstate[1]); 
-//      Serial.println("  "); 
+      Serial.print("Button 2: ");
+      Serial.print(bstate[1]); 
+      Serial.println("  "); 
     } else if (cnt == 4) {
       bstate[2] = digitalRead(sigout); 
-//      Serial.print("Button 3: ");
-//      Serial.print(bstate[2]); 
-//      Serial.println("  "); 
+      Serial.print("Button 3: ");
+      Serial.print(bstate[2]); 
+      Serial.println("  "); 
     } else if (cnt == 5) {
       bstate[3] = digitalRead(sigout); 
-//      Serial.print("Button 4: ");
-//      Serial.print(bstate[3]); 
-//      Serial.println("  "); 
+      Serial.print("Button 4: ");
+      Serial.print(bstate[3]); 
+      Serial.println("  "); 
     } else if (cnt == 6) {
       bstate[4] = digitalRead(sigout); 
-//      Serial.print("Button 5: ");
-//      Serial.print(bstate[4]); 
-//      Serial.println("  "); 
+      Serial.print("Button 5: ");
+      Serial.print(bstate[4]); 
+      Serial.println("  "); 
     } else if (cnt == 7) {
       bstate[5] = digitalRead(sigout); 
-//      Serial.print("Button 6: ");
-//      Serial.print(bstate[5]); 
-//      Serial.println("  "); 
+      Serial.print("Button 6: ");
+      Serial.print(bstate[5]); 
+      Serial.println("  "); 
     } else if (cnt == 8) {
       pinMode(sigout, OUTPUT); 
       if (red1state == 0) {
@@ -172,17 +172,17 @@ void mux_read() {
   
     } else if (cnt == 13) {
       bstate[6] = digitalRead(sigout); 
-//      Serial.print("Button 7: "); 
-//      Serial.print(bstate[6]); 
-//      Serial.println("  "); 
+      Serial.print("Button 7: "); 
+      Serial.print(bstate[6]); 
+      Serial.println("  "); 
     } else if (cnt == 14) {
       bstate[7] = digitalRead(sigout); 
-//      Serial.print("Button 8: "); 
-//      Serial.print(bstate[7]); 
-//      Serial.println("  "); 
+      Serial.print("Button 8: "); 
+      Serial.print(bstate[7]); 
+      Serial.println("  "); 
     }
 
-    //delay(500); // time to read - for debugging
+    delay(300); // time to read - for debugging
   }
 }
 

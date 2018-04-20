@@ -136,17 +136,17 @@ void setup() {
 }
 
 void loop() {
-  receiveMessage();
-  delay(100);
-  if (arm_moving == true) {
-    read_arm_encoders();
-  }
+  //receiveMessage();
+  //delay(100);
+//  if (arm_moving == true) {
+//    read_arm_encoders();
+//  }
   //  read_motor_encoders();
   //  read_gas_sensor();
-  //  armcnterclockwise(0);
-  //  armclockwise(0);
-  //  delay(500);
-  //  delay(1000);
+//  armcnterclockwise(0);
+
+//  delay(500); 
+//  armclockwise(0);
   //  arm_servo_fwd();
   //  delay(1000);
   //  arm_servo_bwd();
@@ -155,10 +155,10 @@ void loop() {
   //  delay(500);
   //  armMotor1BWD(100);
   //  delay(500);
-  //  wristcnterclockwise(500);
+  //wristcnterclockwise(0);
   //  wristclockwise(500);
   //  delay(500);
-  sendMessage();
+  //sendMessage();
 }
 
 /**
