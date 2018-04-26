@@ -80,8 +80,10 @@ Servo servo1;
 int servo1_pos = 0;
 
 // ARM STEPPERS
-const int stepsPerRevA = (1 / 0.9) * 360;
+//const int stepsPerRevA = (1 / 0.9) * 360;
 const int stepsPerRevW = (1 / 1.8) * 360;
+const int stepsPerRevA = 400;
+//const int stepsPerRevW = 4;
 
 Stepper armStepper(stepsPerRevA, 22, 23, 24, 25);
 Stepper wristStepper(stepsPerRevW, 26, 27, 28, 29);
@@ -116,8 +118,9 @@ void setup() {
   pinMode(limit_up,   INPUT);
   pinMode(limit_down, INPUT);
 
-  armStepper.setSpeed(50);
-  wristStepper.setSpeed(50);
+  // UNITS: ROTATIONS / MINUTE 
+  armStepper.setSpeed(20);
+  wristStepper.setSpeed(100);
   servo1.attach(servo1_pin);
 
   eeprom_read_block((void*)&settings, (void*)0, sizeof(settings));
@@ -137,14 +140,23 @@ void setup() {
 
 void loop() {
   //receiveMessage();
-  //delay(100);
+  
 //  if (arm_moving == true) {
 //    read_arm_encoders();
 //  }
   //  read_motor_encoders();
   //  read_gas_sensor();
+//  armclockwise(0);
+//
+  armclockwise(0);
+//  wristcnterclockwise(0);
+  //delay(500);
+//  armcnterclockwise(100);
+//  delay(500);
+  
+//  delay(500);
 //  armcnterclockwise(0);
-
+//  delay(500);
 //  delay(500); 
 //  armclockwise(0);
   //  arm_servo_fwd();
@@ -384,25 +396,25 @@ void wristcnterclockwise(int timedelay) {
 void armclockwise(int timedelay) {
   // CHECK THIS:
   check_limit_up(); 
-  if (allow_up == true) {
+//  if (allow_up == true) {
     Serial.println("clockwise");
     armStepper.step(stepsPerRevA);
     delay(timedelay);
-  } else {
-    return;
-  }
+//  } else {
+//    return;
+//  }
 }
 
 void armcnterclockwise(int timedelay) {
   // CHECK THIS:
   check_limit_down(); 
-  if (allow_down == true) {
+//  if (allow_down == true) {
     Serial.println("counterclockwise");
     armStepper.step(-stepsPerRevA);
     delay(timedelay);
-  } else {
-    return;
-  }
+//  } else {
+//    return;
+//  }
 }
 
 /**
