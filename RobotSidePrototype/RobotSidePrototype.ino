@@ -16,7 +16,7 @@
 #define MISO 50
 
 // Instance of the radio driver
-RH_NRF24 nrf24;
+RH_NRF24 nrf24(8,53);
 
 // VALUES FOR GAS SENSOR
 #define gasPin A0
@@ -146,30 +146,23 @@ void loop() {
 //  }
   //  read_motor_encoders();
   //  read_gas_sensor();
-//  armclockwise(0);
-//
-  armclockwise(0);
-//  wristcnterclockwise(0);
-  //delay(500);
-//  armcnterclockwise(100);
-//  delay(500);
-  
-//  delay(500);
-//  armcnterclockwise(0);
-//  delay(500);
-//  delay(500); 
-//  armclockwise(0);
-  //  arm_servo_fwd();
-  //  delay(1000);
-  //  arm_servo_bwd();
-  //  delay(1000);
-  //  armMotor1FWD(100);
-  //  delay(500);
-  //  armMotor1BWD(100);
-  //  delay(500);
-  //wristcnterclockwise(0);
-  //  wristclockwise(500);
-  //  delay(500);
+    delay(1000);
+    motor1FWD(150);
+    delay(1000);
+    motor1BWD(150); 
+    delay(1000);
+    motor1Pause(); 
+    motor2FWD(150);
+    delay(1000);
+    motor2BWD(150); 
+    delay(1000);
+    motor2Pause(); 
+    armMotor1FWD(150);
+    delay(1000);
+    armMotor1BWD(150);
+    delay(1000);
+    armMotor1Pause();
+ 
   //sendMessage();
 }
 
