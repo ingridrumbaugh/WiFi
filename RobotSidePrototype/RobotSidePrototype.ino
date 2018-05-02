@@ -34,8 +34,8 @@ int bstate[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 #define motor1Pin1 7 // INA
 #define motor1Pin2 9 // INB 
 
-#define motor2Pin1 5
-#define motor2Pin2 6
+#define motor2Pin1 5 // INA 
+#define motor2Pin2 6 // INB
 
 // DRIVE MOTOR ENCODERS
 #define enc1A 18
@@ -54,18 +54,22 @@ int enc2Pos = 0;
 int enc2ALast = LOW;
 int n2 = LOW;
 
-// VALUES FOR ARM MOTOR ENCODER
+// VALUES FOR WRIST MOTOR ENCODER
 int val3;
 int enc3Pos = 0;
 int enc3ALast = LOW;
 int n3 = LOW;
 
 // ARM MOTOR PINS
-#define arm_pwm1 42 // 51
-#define arm_motor1_pin1 43 // 52
-#define arm_motor1_pin2 44 // 53
+#define arm_pwm1 10 //42 // 51
+#define arm_motor1_pin1 11 // 43 // 52
+#define arm_motor1_pin2 12 // 44 // 53
 
-// ARM ENCODERS
+#define arm_pwm2 43
+#define arm_motor2_pin1 45
+#define arm_motor2_pin2 47
+
+// WRIST (arm1) ENCODERS
 #define enc3A 2
 #define enc3B 3
 bool arm_moving = false;
@@ -83,7 +87,6 @@ int servo1_pos = 0;
 //const int stepsPerRevA = (1 / 0.9) * 360;
 const int stepsPerRevW = (1 / 1.8) * 360;
 const int stepsPerRevA = 400;
-//const int stepsPerRevW = 4;
 
 Stepper armStepper(stepsPerRevA, 22, 23, 24, 25);
 Stepper wristStepper(stepsPerRevW, 26, 27, 28, 29);
@@ -106,6 +109,14 @@ void setup() {
   pinMode(pwm2, OUTPUT);
   pinMode(motor2Pin1, OUTPUT);
   pinMode(motor2Pin2, OUTPUT);
+
+  pinMode(arm_pwm1, OUTPUT);
+  pinMode(arm_motor1_pin1, OUTPUT);
+  pinMode(arm_motor1_pin2, OUTPUT);
+
+  pinMode(arm_pwm2, OUTPUT);
+  pinMode(arm_motor2_pin1, OUTPUT);
+  pinMode(arm_motor2_pin2, OUTPUT); 
 
   pinMode(enc1A, INPUT);
   pinMode(enc1B, INPUT);
@@ -146,22 +157,27 @@ void loop() {
 //  }
   //  read_motor_encoders();
   //  read_gas_sensor();
-    delay(1000);
-    motor1FWD(150);
-    delay(1000);
-    motor1BWD(150); 
-    delay(1000);
-    motor1Pause(); 
-    motor2FWD(150);
-    delay(1000);
-    motor2BWD(150); 
-    delay(1000);
-    motor2Pause(); 
-    armMotor1FWD(150);
-    delay(1000);
-    armMotor1BWD(150);
-    delay(1000);
-    armMotor1Pause();
+//    delay(1000);
+//    motor1FWD(150);
+//    delay(1000);
+//    motor1BWD(150); 
+//    delay(1000);
+//    motor1Pause(); 
+//    motor2FWD(150);
+//    delay(1000);
+//    motor2BWD(150); 
+//    delay(1000);
+//    motor2Pause(); 
+//    armMotor1FWD(150);
+//    delay(1000);
+//    armMotor1BWD(150);
+//    delay(1000);
+//    armMotor1Pause();
+//    delay(1000); 
+    armclockwise(0);
+    delay(1000); 
+    armcnterclockwise(0);
+    delay(1000); 
  
   //sendMessage();
 }
@@ -247,6 +263,7 @@ void read_motor_encoders() {
 
 }
 
+// wrist 
 void read_arm_encoders() {
   n3 = digitalRead(enc3A);
 
@@ -314,6 +331,7 @@ void fullStop() {
   motor1Pause();
   motor2Pause();
   armMotor1Pause();
+  armMotor2Pause(); 
 }
 
 /**
@@ -385,80 +403,111 @@ void wristcnterclockwise(int timedelay) {
   wristStepper.step(-stepsPerRevW);
   delay(timedelay);
 }
-
-void armclockwise(int timedelay) {
-  // CHECK THIS:
-  check_limit_up(); 
-//  if (allow_up == true) {
-    Serial.println("clockwise");
-    armStepper.step(stepsPerRevA);
-    delay(timedelay);
-//  } else {
-//    return;
-//  }
-}
-
-void armcnterclockwise(int timedelay) {
-  // CHECK THIS:
-  check_limit_down(); 
-//  if (allow_down == true) {
-    Serial.println("counterclockwise");
-    armStepper.step(-stepsPerRevA);
-    delay(timedelay);
-//  } else {
-//    return;
-//  }
-}
+//
+//void armclockwise(int timedelay) {
+//  // CHECK THIS:
+//  check_limit_up(); 
+////  if (allow_up == true) {
+//    Serial.println("clockwise");
+//    armStepper.step(stepsPerRevA);
+//    delay(timedelay);
+////  } else {
+////    return;
+////  }
+//}
+//
+//void armcnterclockwise(int timedelay) {
+//  // CHECK THIS:
+//  check_limit_down(); 
+////  if (allow_down == true) {
+//    Serial.println("counterclockwise");
+//    armStepper.step(-stepsPerRevA);
+//    delay(timedelay);
+////  } else {
+////    return;
+////  }
+//}
 
 /**
    Methods for the arm motor
 */
 void armMotor1FWD(int pwm) {
   // CHECK THIS
-  if (allow_rotate_cw == true) {
+//  if (allow_rotate_cw == true) {
     arm_moving = true;
     digitalWrite(arm_motor1_pin1, HIGH);
     digitalWrite(arm_motor1_pin2, LOW);
     analogWrite(arm_pwm1, pwm);
-  } else {
-    armMotor1Pause();
-    return;
-  }
+//  } else {
+//    armMotor1Pause();
+//    return;
+//  }
 
 }
 
 void armMotor1BWD(int pwm) {
-  if (allow_rotate_ccw == true) {
+//  if (allow_rotate_ccw == true) {
     arm_moving = true;
     digitalWrite(arm_motor1_pin1, LOW);
     digitalWrite(arm_motor1_pin2, HIGH);
     analogWrite(arm_pwm1, pwm);
-  } else {
-    armMotor1Pause();
-    return;
-  }
+//  } else {
+//    armMotor1Pause();
+//    return;
+//  }
 }
 
 void armMotor1Pause() {
   arm_moving = false;
-  digitalWrite(arm_motor1_pin1, HIGH);
-  digitalWrite(arm_motor1_pin2, HIGH);
+  digitalWrite(arm_motor1_pin1, LOW);
+  digitalWrite(arm_motor1_pin2, LOW);
+  analogWrite(arm_pwm1, 0);
+}
+
+void armMotor2FWD(int pwm) {
+  // CHECK THIS:
+  check_limit_up(); 
+//  if (allow_up == true) {
+    digitalWrite(arm_motor2_pin1, HIGH); 
+    digitalWrite(arm_motor2_pin2, LOW); 
+    analogWrite(arm_pwm2, pwm); 
+//  } else {
+//      armMotor2Pause(); 
+//    return;
+//  }
+}
+
+void armMotor2BWD(int pwm) {
+  check_limit_down(); 
+//  if (allow_down == true) {
+    digitalWrite(arm_motor2_pin1, LOW); 
+    digitalWrite(arm_motor2_pin2, HIGH); 
+    analogWrite(arm_pwm2, pwm); 
+//  } else {
+//      armMotor2Pause(); 
+//      return;
+}
+
+void armMotor2Pause() {
+  digitalWrite(arm_motor2_pin1, LOW);
+  digitalWrite(arm_motor2_pin2, LOW);
+  analogWrite(arm_pwm2, 0); 
 }
 
 bool check_limit_up() {
   if (digitalRead(limit_up) == LOW) {
-    allow_up = false;
-  } else {
     allow_up = true;
+  } else {
+    allow_up = false;
   }
   return allow_up;
 }
 
 bool check_limit_down() {
   if (digitalRead(limit_down) == LOW) {
-    allow_down = false;
-  } else {
     allow_down = true;
+  } else {
+    allow_down = false;
   }
   return allow_down;
 }
