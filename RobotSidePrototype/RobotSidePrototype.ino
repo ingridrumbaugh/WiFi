@@ -153,13 +153,70 @@ void setup() {
 
 void loop() {
   receiveMessage();
+  Serial.println(" ");
+  Serial.print("Joystate1: ");
+  Serial.print(joystate1); 
+  Serial.println(" ");
+  Serial.print("Joystate2: ");
+  Serial.print(joystate2);
+  Serial.println("  "); 
+  
+  if (0 <= joystate1 && joystate1 <= 5) {
+    Serial.println("M1 Forward");
+    motor1FWD(150);
 
-  if (wrist_moving == true) {
-    read_wrist_encoders();
+  } else if (240 <= joystate1 && joystate1  <= 255) {
+    Serial.println("M2 Backward");
+    motor1BWD(150);
+
+  } else {
+    Serial.println("Pause");
+    motor1Pause();
   }
-  read_motor_encoders();
-  read_gas_sensor();
 
+  if (0 <= joystate2 && joystate2 <= 5) {
+    motor2FWD(150);
+
+  } else if (240 <= joystate2 && joystate2 <= 255) {
+    motor2BWD(150);
+
+  } else {
+    motor2Pause();
+  }
+
+  if (bstate[0] == 0) { }
+  if (bstate[0] == 1) { }
+
+  if (bstate[1] == 0) { }
+  if (bstate[1] == 1) { }
+
+  if (bstate[2] == 0) { }
+  if (bstate[2] == 1) { }
+
+  if (bstate[3] == 0) { }
+  if (bstate[3] == 1) { }
+
+  if (bstate[4] == 0) { }
+  if (bstate[4] == 1) { }
+
+  if (bstate[5] == 0) { }
+  if (bstate[5] == 1) { }
+
+  if (bstate[6] == 0) { }
+  if (bstate[6] == 1) { }
+
+  if (bstate[7] == 0) { }
+  if (bstate[7] == 1) { }
+
+  //  close_claw(0);
+
+  read_motor_encoders();
+  //  wrist_clockwise(150);
+  //  delay(1000);
+  //  wrist_cnterclockwise(150);
+  //  delay(1000);
+
+  //  sendMessage calls read_gas_sensor
   sendMessage();
 }
 
@@ -167,7 +224,7 @@ void loop() {
   NRF Server code - to be called in loop
 */
 void receiveMessage() {
-  Serial.println("Receiving from MID");
+    Serial.println("Receiving from MID");
 
   //Define Input (Currently 3 bytes)
   byte buf[3] = {};
@@ -179,6 +236,7 @@ void receiveMessage() {
   }
   else {
     Serial.println("Receive failed.");
+    // put fullStop() here 
     return;
   }
 
@@ -207,10 +265,11 @@ void receiveMessage() {
   NRF Client code - to be called in loop
 */
 void sendMessage() {
-  Serial.println("Sending to MID");
+  read_gas_sensor();
+  //  Serial.println("Sending to MID");
 
   byte gas[1];
-  uint8_t temp = 101;
+  uint8_t temp = analogSensor;
 
   //MESS[0] SHOULD BE THE GAS SENSOR DATA
   gas[0] = (byte)temp;
@@ -383,9 +442,11 @@ void open_claw(int timedelay) {
    Methods for the arm motor
 */
 void wrist_clockwise(int pwm) {
+  read_wrist_encoders();
   // CHECK THIS
   //  if (allow_rotate_cw == true) {
   wrist_moving = true;
+
   digitalWrite(wrist_motor_pin1, HIGH);
   digitalWrite(wrist_motor_pin2, LOW);
   analogWrite(wrist_pwm, pwm);
@@ -393,10 +454,10 @@ void wrist_clockwise(int pwm) {
   //    wristPause();
   //    return;
   //  }
-
 }
 
 void wrist_cnterclockwise(int pwm) {
+  read_wrist_encoders();
   //  if (allow_rotate_ccw == true) {
   wrist_moving = true;
   digitalWrite(wrist_motor_pin1, LOW);
@@ -409,35 +470,35 @@ void wrist_cnterclockwise(int pwm) {
 }
 
 void wristPause() {
+  read_wrist_encoders();
   wrist_moving = false;
   digitalWrite(wrist_motor_pin1, LOW);
   digitalWrite(wrist_motor_pin2, LOW);
   analogWrite(wrist_pwm, 0);
 }
 
-// armMotor2FWD
 void armMotorUP(int pwm) {
-  // CHECK THIS:
   check_limit_up();
-  //  if (allow_up == true) {
-  digitalWrite(arm_motor_pin1, HIGH);
-  digitalWrite(arm_motor_pin2, LOW);
-  analogWrite(arm_pwm, pwm);
-  //  } else {
-  //      armMotorPause();
-  //    return;
-  //  }
+  if (allow_up == true) {
+    digitalWrite(arm_motor_pin1, HIGH);
+    digitalWrite(arm_motor_pin2, LOW);
+    analogWrite(arm_pwm, pwm);
+  } else {
+    armMotorPause();
+    return;
+  }
 }
 
 void armMotorDOWN(int pwm) {
   check_limit_down();
-  //  if (allow_down == true) {
-  digitalWrite(arm_motor_pin1, LOW);
-  digitalWrite(arm_motor_pin2, HIGH);
-  analogWrite(arm_pwm, pwm);
-  //  } else {
-  //      armMotorPause();
-  //      return;
+  if (allow_down == true) {
+    digitalWrite(arm_motor_pin1, LOW);
+    digitalWrite(arm_motor_pin2, HIGH);
+    analogWrite(arm_pwm, pwm);
+  } else {
+    armMotorPause();
+    return;
+  }
 }
 
 void armMotorPause() {
@@ -449,8 +510,10 @@ void armMotorPause() {
 bool check_limit_up() {
   if (digitalRead(limit_up) == LOW) {
     allow_up = true;
+    Serial.println("live ur dreams");
   } else {
     allow_up = false;
+    Serial.println("nah fam");
   }
   return allow_up;
 }

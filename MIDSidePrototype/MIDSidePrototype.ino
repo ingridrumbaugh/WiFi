@@ -68,8 +68,8 @@ void loop() {
   // MUX
   digitalWrite(en, LOW); // enable all the time for now
   mux_read();
-  //sendMessage(); 
-  //receiveMessage();
+  sendMessage(); 
+  receiveMessage();
 }
 
 void mux_read() {
@@ -182,7 +182,7 @@ void mux_read() {
       Serial.println("  "); 
     }
 
-    delay(300); // time to read - for debugging
+//    delay(300); // time to read - for debugging
   }
 }
 
@@ -199,8 +199,10 @@ void sendMessage() {
     }
   }
 
-  mess[0] = (byte)joystate1;
-  mess[1] = (byte)joystate2;
+  mess[0] = byte(joystate1 >>2);
+  Serial.println("Shit we just byte shifted"); 
+  Serial.println(byte(joystate1 >>2));
+  mess[1] = byte(joystate2 >>2);
   mess[2] = (byte)buttons;
   
   nrf24.send(mess, sizeof(mess));
